@@ -111,6 +111,15 @@ public class SnakePanel extends JPanel implements ActionListener {
         }
     }
 
+    void checkCollisions() {
+        // Si el gusano colisiona con su cuerpo
+        for (int i = partes; i > 0; i--) {
+            if (x[0] == x[i] && y[0] == y[i]) {
+                running = false;
+            }
+        }
+    }
+
     private void gameOver(Graphics g) {
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD, 75));
@@ -124,6 +133,7 @@ public class SnakePanel extends JPanel implements ActionListener {
         // Evento constantes
         if (running) {
             mover();
+            checkApple();
         }
         repaint();
     }
