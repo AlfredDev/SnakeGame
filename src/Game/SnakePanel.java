@@ -12,6 +12,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -43,6 +45,7 @@ public class SnakePanel extends JPanel implements ActionListener {
         setBackground(Color.BLACK);
         setFocusable(true);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        addKeyListener(new MyKeyAdapter());
         IniciarJuego();
     }
 
@@ -62,10 +65,7 @@ public class SnakePanel extends JPanel implements ActionListener {
     private void draw(Graphics g) {
         // Pintaremos  el panel con cuadriculas
         if (running) {
-            for (int i = 0; i < WIDTH; i++) {
-                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, HEIGHT); // Lineal Verticales con sepacion del UNIT_SIZE
-                g.drawLine(0, i * UNIT_SIZE, WIDTH, i * UNIT_SIZE);
-            }
+
             g.setColor(Color.RED);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
@@ -101,6 +101,20 @@ public class SnakePanel extends JPanel implements ActionListener {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
         }
+        switch (direction) {
+            case 'U':
+                y[0] = y[0] - UNIT_SIZE;
+                break;
+            case 'D':
+                y[0] = y[0] + UNIT_SIZE;
+                break;
+            case 'L':
+                x[0] = x[0] - UNIT_SIZE;
+                break;
+            case 'R':
+                x[0] = x[0] + UNIT_SIZE;
+                break;
+        }
     }
 
     public void checkApple() {
@@ -109,6 +123,7 @@ public class SnakePanel extends JPanel implements ActionListener {
             apple++;
             newApple();
         }
+
     }
 
     void checkCollisions() {
@@ -117,6 +132,27 @@ public class SnakePanel extends JPanel implements ActionListener {
             if (x[0] == x[i] && y[0] == y[i]) {
                 running = false;
             }
+        }
+
+        // Si la cabeza choca el borde izquiedo
+        if (x[0] < 0) {
+            running = false;
+        }
+        // Si la cabeza choca el borde derecho
+        if (x[0] > WIDTH) {
+            running = false;
+        }
+        // Si la cabeza choca el borde inferior
+        if (y[0] > HEIGHT) {
+            running = false;
+        }
+        // Si la cabeza choca el borde superios
+        if (y[0] < 0) {
+            running = false;
+        }
+
+        if (!running) {
+            timer.stop();
         }
     }
 
@@ -134,8 +170,39 @@ public class SnakePanel extends JPanel implements ActionListener {
         if (running) {
             mover();
             checkApple();
+            checkCollisions();
         }
         repaint();
+    }
+
+    public class MyKeyAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_LEFT:
+                    if (direction != 'R') {
+                        direction = 'L';
+                    }
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if (direction != 'L') {
+                        direction = 'R';
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    if (direction != 'D') {
+                        direction = 'U';
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if (direction != 'U') {
+                        direction = 'D';
+                    }
+                    break;
+            }
+        }
+
     }
 
 }
